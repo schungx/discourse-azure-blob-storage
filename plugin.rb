@@ -1,14 +1,15 @@
 # name: discourse-azure-blob-storage
 # about: Azure Blob storage
-# version: 0.0.2
+# version: 0.0.3
 # authors: Maja Komel
 # url: https://github.com/discourse/discourse-azure-blob-storage
 
 require "file_store/base_store"
 
 # GEMS
-gem 'faraday_middleware', '1.0.0', {require: false}
-gem 'net-http-persistent', '4.0.0', {require: false}
+gem 'faraday_middleware', '1.0.0', {require: true}
+gem 'connection_pool', '2.2.5', {require: false}
+gem 'net-http-persistent', '4.0.1', require: true, require_name: "net/http/persistent"
 gem 'azure-storage-common', '2.0.2', {require: false}
 gem 'azure-storage-blob', '2.0.1', {require: false}
 
@@ -16,7 +17,16 @@ require 'azure/storage/blob'
 
 enabled_site_setting :azure_blob_storage_enabled
 
+require_relative "lib/azure_blob_store"
+
 after_initialize do
+  class ::Faraday::Adapter::NetHttpPersistent
+    def self.new(*)
+      self.load_error = nil
+
+      super
+    end
+  end
 
   SiteSetting::Upload.class_eval do
     class << self
