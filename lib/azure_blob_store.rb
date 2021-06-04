@@ -50,6 +50,10 @@ module FileStore
       cdn_hostname.presence && url[cdn_hostname]
     end
 
+    def update_upload_ACL(upload)
+      true
+    end
+    
     def azure_blob_container
       SiteSetting.azure_blob_storage_container_name
     end
